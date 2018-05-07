@@ -15,13 +15,17 @@
 #ifndef DAWN_OPTIMIZER_PASSSETMULTISTAGECACHES_H
 #define DAWN_OPTIMIZER_PASSSETMULTISTAGECACHES_H
 
+#include "dawn/Optimizer/Interval.h"
 #include "dawn/Optimizer/Pass.h"
+#include "dawn/Optimizer/Stage.h"
 
 namespace dawn {
 
 /// @brief Determine which fields can be cached during the executation of the multi-stage
 ///
 /// @ingroup optimizer
+///
+/// This pass is not necessary to create legal code and is hence not in the debug-group
 class PassSetCaches : public Pass {
 public:
   PassSetCaches();
