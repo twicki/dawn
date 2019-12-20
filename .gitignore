@@ -1,6 +1,16 @@
-# Custom ignores
-_local_*
-_local_/*
+*.pyc
+*.log
+*.old
+*.out
+*.DS_Store
+*.~
+*~
+*.user
+*.project
+
+# Build directories
+build*/
+install*/
 
 # Ignore IDEs
 .idea
@@ -10,3 +20,6 @@ _local_/*
 
 # Ignore python editable installs
 *.egg-info/
+# Custom ignores
+_local_*
+_local_/*

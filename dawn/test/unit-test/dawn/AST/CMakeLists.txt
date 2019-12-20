@@ -1,22 +1,20 @@
 ##===------------------------------------------------------------------------------*- CMake -*-===##
-##                          _                      
-##                         | |                     
-##                       __| | __ ___      ___ ___  
-##                      / _` |/ _` \ \ /\ / / '_  | 
+##                          _
+##                         | |
+##                       __| | __ ___      ___ ___
+##                      / _` |/ _` \ \ /\ / / '_  |
 ##                     | (_| | (_| |\ V  V /| | | |
 ##                      \__,_|\__,_| \_/\_/ |_| |_| - Compiler Toolchain
 ##
 ##
-##  This file is distributed under the MIT License (MIT). 
+##  This file is distributed under the MIT License (MIT).
 ##  See LICENSE.txt for details.
 ##
 ##===------------------------------------------------------------------------------------------===##
 
-dawn_add_unittest_impl(
-  NAME DawnUnittestAST
-  SOURCES
-          TestOffset.cpp
-          TestMain.cpp
+add_executable(DawnUnittestAST TestMain.cpp TestOffset.cpp)
+target_link_libraries(DawnUnittestAST PRIVATE DawnSIR DawnUnittest gtest)
+target_add_dawn_standard_props(DawnUnittestAST)
+add_test(NAME DawnUnittestAST
+  COMMAND DawnUnittestAST
 )
-target_include_directories(DawnUnittestAST PUBLIC $<TARGET_PROPERTY:DawnASTObjects,INCLUDE_DIRECTORIES>)
-
