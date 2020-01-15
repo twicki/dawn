@@ -80,8 +80,7 @@ TEST(CodeGenNaiveTest, LaplacianStencil) {
 
   std::string generatedCode = dump(stencilInstantiation);
 
-  std::string referenceCode =
-      read("test/unit-test/dawn/CodeGen/Naive/generated/diffusion_reference.cpp");
+  std::string referenceCode = read("generated/diffusion_reference.hpp");
   ASSERT_EQ(generatedCode, referenceCode) << "Generated code does not match reference code";
 }
 
@@ -118,8 +117,7 @@ TEST(CodeGenNaiveTest, NonOverlappingInterval) {
 
   std::string generatedCode = dump(stencilInstantiation);
 
-  std::string referenceCode =
-      read("test/unit-test/dawn/CodeGen/Naive/generated/nonoverlapping_reference.cpp");
+  std::string referenceCode = read("generated/nonoverlapping_reference.cpp");
   ASSERT_EQ(generatedCode, referenceCode) << "Generated code does not match reference code";
 }
 

@@ -19,4 +19,5 @@ add_executable(${executable}
 )
 target_add_dawn_standard_props(${executable})
 target_link_libraries(${executable} DawnUnittest gtest)
+file(COPY generated DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 add_test(NAME ${executable} COMMAND ${executable})

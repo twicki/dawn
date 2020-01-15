@@ -41,7 +41,7 @@ namespace cxxnaive{
 class generated {
 private:
 
-  struct stencil_59 {
+  struct stencil_107 {
 
     // Members
 
@@ -54,7 +54,7 @@ private:
     // Input/Output storages
   public:
 
-    stencil_59(const gridtools::dawn::domain& dom_, int rank, int xcols, int ycols) : m_dom(dom_){}
+    stencil_107(const gridtools::dawn::domain& dom_, int rank, int xcols, int ycols) : m_dom(dom_){}
 
     void run(storage_ijk_t& in_, storage_ijk_t& out_) {
       int iMin = m_dom.iminus();
@@ -87,12 +87,12 @@ private:
     }
   };
   static constexpr const char* s_name = "generated";
-  stencil_59 m_stencil_59;
+  stencil_107 m_stencil_107;
 public:
 
   generated(const generated&) = delete;
 
-  generated(const gridtools::dawn::domain& dom, int rank = 1, int xcols = 1, int ycols = 1) : m_stencil_59(dom, rank, xcols, ycols){
+  generated(const gridtools::dawn::domain& dom, int rank = 1, int xcols = 1, int ycols = 1) : m_stencil_107(dom, rank, xcols, ycols){
     assert(dom.isize() >= dom.iminus() + dom.iplus());
     assert(dom.jsize() >= dom.jminus() + dom.jplus());
     assert(dom.ksize() >= dom.kminus() + dom.kplus());
@@ -100,7 +100,7 @@ public:
   }
 
   void run(storage_ijk_t in, storage_ijk_t out) {
-    m_stencil_59.run(in,out);
+    m_stencil_107.run(in,out);
   }
 };
 } // namespace cxxnaive
