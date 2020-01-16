@@ -8,128 +8,48 @@ Contract to the user from HIR
 Dawn will generate code based on the operations passed from high-level
 intermediate representation. It's specification can be found `here`_.
 
-Dependencies
-~~~~~~~~~~~~
+HIR execution model
+~~~~~~~~~~~~~~~~~~~
 
-Generally, stencil computation in dawn differentiates between horizontal
-and the vertical dimension. The assumption is that individual statements
-of a stencil are embarrassingly parallel in the horizontal. For that
-reason, there is no guarantee that any horizontal point's computation
-will be finished before any other in each user statement.
-
-Vertical Dependencies
-^^^^^^^^^^^^^^^^^^^^^
-
-Each vertical region of a stencil specifies a loop order of execution.
-Dawn will uphold the following rules:
-
--  If the loop order is forward, any statement with a vertical
-   dependency on other statements executed on a vertical level with
-   index ``k`` will be executed after each statement that it depends on
-   that appears previously in the current vertical region or in any
-   previous vertical region was executed on every vertical level with
-   indices ``k-1`` and smaller.
--  If the loop order is backward, any statement with a vertical
-   dependency on another statement executed on a vertical level with
-   index ``k`` will be executed after each statement that it depends on
-   that appears previously in the current vertical region or in any
-   previous vertical region was executed on every vertical level with
-   indices ``k+1`` and bigger.
-
-An example of this would be the following
+Generally, stencil computations in dawn differentiates between
+horizontal (denoted by `i,j`) and the vertical dimension (`k`).
+The execution model is described by a `vertical_region` spanning
+a k-range with direction which contains statements.
 
 .. code:: c++
 
-   1 vertical_region(k_start, k_end)
-   2   one = 1
-   3 vertical_region(k_start, k_end)
-   4   two = one[k - 1]
+   1 vertical_region(k_start, k_end) // forward
+   2   statement1
+   3   statement2
+   4 vertical_region(k_end, k_start) // backward
+   5   statement3
+   6   statement4
 
-Here, for every level with index ``k``, line two will be executed before
-line 4.
+The HIR code as described by these constructs behaves as if
 
-Horizontal Dependencies
-^^^^^^^^^^^^^^^^^^^^^^^
+- *vertical_regions* are executed sequentially in the order they appear,
+- *statements* inside *vertical_regions* are executed as (sequential) for-loops
+  over the k-range,
+- a *statement* inside the *vertical_region* is executed as a
+  parallel for-loop over the horizontal dimension(s).
 
-Irrespective of the loop order every statement with a horizontal
-dependency on other statements will be executed after all statements it
-depends on are executed on the full horizontal plane in the same
-vertical level.
+The pseudo-code translation of the above example is
 
-An example of this is the following
-
-.. code:: c++
-
-   1 vertical_region(k_start, k_end)
-   2   one = 1
-   3   two = one[i - 1]
-
-For every vertical level, we guarantee that line two will be executed on
-the full horizontal plane before line three will be executed.
-
---------------
-
-   It is currently unclear how we should handle this in one corner case:
-   Non-temporary fields can cause problem in the following case: write
-   center, read offset, write center. This is currently translated to
-   one multistage with three stages. The problem is that on input /
-   output fields we duplicate the writes which can have 2 side-effects
-   if neighboring blocks are out of sync: Block 1 writes in its extended
-   domain (line 2), block 2 writes (line 2) (same value), then reads
-   offset (line 3), then writes in the center (line 4). Now Block 1
-   reads (line 3) and gets the wrong value. This means that if we want
-   to solve the problem we need a global sync in that case (meaning
-   breaking the kernel call).
 
 .. code:: c++
 
-   1 vertical_region(k_start, k_end){
-   2   one = 1
-   3   two = one[i - 1]
-   4   one = 2
-   5 }
+   1  for k = k_start:k_end
+   2    parfor ij
+   3      statement1
+   4    parfor ij
+   5      statement2
+   6  for k = k_end:k_start
+   7    parfor ij
+   8      statement3
+   9    parfor ij
+   10     statement4
 
-translates to
-
-::
-
-   MultiStage_0 [parallel]
-       {
-         Stage_0
-         {
-           Do_0 { Start : End }
-           {
-             one[<no_horizontal_offset>,0] = int_type 1;
-           }
-           Extents: [(-1,0),(0,0),(0,0)]
-         }
-         Stage_1
-         {
-           Do_0 { Start : End }
-           {
-             two[<no_horizontal_offset>,0] = one[-1,0,0];
-           }
-           Extents: [<no_horizontal_extent>,(0,0)]
-         }
-         Stage_2
-         {
-           Do_0 { Start : End }
-           {
-             one[<no_horizontal_offset>,0] = int_type 2;
-           }
-           Extents: [<no_horizontal_extent>,(0,0)]
-         }
-       }
-
---------------
-
-Compute Domain
-~~~~~~~~~~~~~~
-
-If the vertical region does not specify any horizontal extent, dawn
-ensures that the compute-domain of statements that others depend on is
-extended to fill all the intermediate fields as required. If a
-horizontal compute-domain is specified, it is never extended.
+where `parfor ij` means that there is no guarantee of the order in which horizontal points are executed.
 
 Internal Contract of Data Structures
 ------------------------------------
