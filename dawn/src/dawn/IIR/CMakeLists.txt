@@ -27,7 +27,6 @@ dawn_protobuf_generate(
 
 if(ENABLE_PYTHON)
   # Generate python proto files
-  include(DawnProtobufGenerate)
   dawn_protobuf_generate(
     OUT_FILES iir_proto_python_files
     PROTOS ${protos}
