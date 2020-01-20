@@ -84,9 +84,13 @@ class CMakeBuild(build_ext):
         os.makedirs(os.path.join(DAWN_DIR, "install"), exist_ok=True)
 
         # Prepare CMake arguments
+        pdir = "/scratch/snx3000/jenkins/workspace/protobuf/slave/daint/install/lib64/cmake/protobuf/"
         cmake_args += [
             "-DPYTHON_EXECUTABLE=" + sys.executable,
-            "-DBUILD_TESTING=False -DDAWN_REQUIRE_PYTHON_TESTING=ON",
+            "-DBUILD_TESTING=False",
+            "-DDAWN_REQUIRE_PYTHON_TESTING=ON",
+            "-DProtobuf_DIR=" + pdir,
+            "-DPROTOBUF_PYTHON_MODULE_DIR=" + pdir + "/../../../python",
         ]
 
         cfg = "Debug" if self.debug else "Release"
