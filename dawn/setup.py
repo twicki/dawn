@@ -84,7 +84,10 @@ class CMakeBuild(build_ext):
         os.makedirs(os.path.join(DAWN_DIR, "install"), exist_ok=True)
 
         # Prepare CMake arguments
-        cmake_args += ["-DPYTHON_EXECUTABLE=" + sys.executable, "-DBUILD_TESTING=False"]
+        cmake_args += [
+            "-DPYTHON_EXECUTABLE=" + sys.executable,
+            "-DBUILD_TESTING=False -DDAWN_REQUIRE_PYTHON_TESTING=ON",
+        ]
 
         cfg = "Debug" if self.debug else "Release"
         cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
